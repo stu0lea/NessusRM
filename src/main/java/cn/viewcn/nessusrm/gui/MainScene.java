@@ -1,11 +1,13 @@
-package cn.viewcn.nessusrm;
+package cn.viewcn.nessusrm.gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-public class NessusReportMake extends Application {
+public class MainScene extends Application {
 
     public static void main(String[] args) {
         launch(args);
@@ -13,7 +15,7 @@ public class NessusReportMake extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(NessusReportMake.class.getResource("view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(MainScene.class.getResource("MainView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("NessusRM by Wei");
         stage.setScene(scene);

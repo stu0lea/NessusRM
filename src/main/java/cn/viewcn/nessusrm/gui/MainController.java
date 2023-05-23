@@ -1,21 +1,36 @@
-package cn.viewcn.nessusrm;
+package cn.viewcn.nessusrm.gui;
 
+import cn.viewcn.nessusrm.api.TxTransApi;
+import com.alibaba.fastjson.JSONObject;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 import javafx.scene.control.ListView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
-public class Controller {
+public class MainController {
+
+
+    @FXML
+    public VBox mainVbox;
+
+    @FXML
+    public MenuItem txTranKeyMenu;
+
     @FXML
     private TextField systemName, createPerson, checkPerson, permitPerson;
 
@@ -53,6 +68,7 @@ public class Controller {
     }
 
     @FXML
+    @Deprecated
     private void handleAddFile(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Add File");
@@ -71,26 +87,51 @@ public class Controller {
     }
 
     @FXML
+    @Deprecated
     private void handleRemoveFile(ActionEvent event) {
         fileList.removeAll(fileListView.getSelectionModel().getSelectedItems());
     }
 
     @FXML
+    @Deprecated
     private void handleSubmitAction(ActionEvent event) {
-        // TODO: Submit files
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String dateString = checkDate.getValue().format(formatter);
-        System.out.println(dateString); // 输出格式为 yyyy-MM-dd 的日期字符
+//         TODO: Submit files
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        String dateString = checkDate.getValue().format(formatter);
+//        System.out.println(dateString); // 输出格式为 yyyy-MM-dd 的日期字符
+        TxTransApi t = new TxTransApi();
+        try {
+            JSONObject res = t.translate("test");
+            System.out.println(res.toJSONString());
+        } catch (Exception e) {
+            System.err.println("Error occurred while calling translation API: " + e.getMessage());
+        }
         fileList.clear();
     }
 
     @FXML
+    @Deprecated
     private void handleClearButtonAction(ActionEvent event) {
         systemName.clear();
         createPerson.clear();
         checkPerson.clear();
         permitPerson.clear();
         fileList.clear();
+    }
+
+    @FXML
+    public void setTxTranKey(ActionEvent event) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(MainController.class.getResource("SetView.fxml"));
+        Stage stage = new Stage();
+        Scene scene = new Scene(fxmlLoader.load(), 400, 150);
+        // 获取当前Stage
+        Scene main_scene = mainVbox.getScene();
+        Stage main_stage = (Stage) main_scene.getWindow();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(main_stage); //避免最大化窗口影响子窗口
+        stage.setTitle("API设置");
+        stage.setScene(scene);
+        stage.show();
     }
 
 }
