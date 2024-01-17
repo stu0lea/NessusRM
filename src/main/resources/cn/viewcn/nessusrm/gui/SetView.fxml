@@ -56,8 +56,8 @@
          <children>
             <Label text="KEY" GridPane.rowIndex="1" />
             <Label text="ID" />
-            <TextField fx:id="txApiId" GridPane.columnIndex="1" />
-            <TextField fx:id="txApiKey" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="txApiId" GridPane.columnIndex="1" focusTraversable="false"/>
+            <TextField fx:id="txApiKey" GridPane.columnIndex="1" GridPane.rowIndex="1" focusTraversable="false"/>
             <Button fx:id="txApiButton" mnemonicParsing="false" onAction="#txApiButton" text="确定" GridPane.rowIndex="2" />
          </children>
          <VBox.margin>

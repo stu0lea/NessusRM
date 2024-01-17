@@ -5,11 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5586dbd0-c09c-4dca-b3eb-8af157a9f90b" name="变更" comment="更新">
-      <change afterPath="$PROJECT_DIR$/example_config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cn/viewcn/nessusrm/gui/MainScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/viewcn/nessusrm/gui/MainScene.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/viewcn/nessusrm/gui/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/viewcn/nessusrm/gui/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/viewcn/nessusrm/gui/SetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/viewcn/nessusrm/gui/SetController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/cn/viewcn/nessusrm/gui/MainView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/cn/viewcn/nessusrm/gui/MainView.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/cn/viewcn/nessusrm/gui/SetView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/cn/viewcn/nessusrm/gui/SetView.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +22,7 @@
         <option value="CSS File" />
         <option value="JavaFXApplication" />
         <option value="Class" />
+        <option value="FxmlFile" />
       </list>
     </option>
   </component>
@@ -50,35 +51,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/Users/secer/Documents/mycode/NessusRM",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "模块",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.常规",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/secer/Documents/mycode/NessusRM&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;模块&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.常规&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql",
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;,
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -97,54 +98,13 @@
       <recent name="cn.viewcn.nessusdm" />
     </key>
   </component>
-  <component name="RunManager" selected="应用程序.TxTransApi">
+  <component name="RunManager" selected="应用程序.MainScene">
     <configuration name="MainScene" type="Application" factoryName="Application" activateToolWindowBeforeRun="false" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="cn.viewcn.nessusrm.gui.MainScene" />
       <module name="NessusRM" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="cn.viewcn.nessusrm.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Trans" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="cn.viewcn.nessusrm.core.Trans" />
-      <module name="NessusRM" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="cn.viewcn.nessusrm.core.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TransApiTx" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="11" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="cn.viewcn.nessusrm.api.TransApiTx" />
-      <module name="NessusRM" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="cn.viewcn.nessusrm.api.TxTansApi.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TransApiTx2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="cn.viewcn.nessusrm.api.TransApiTx2" />
-      <module name="NessusRM" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="cn.viewcn.nessusrm.api.TxTansApi.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -165,34 +125,14 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="txSgin" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="cn.viewcn.nessusrm.api.TxTansApi.txSgin" />
-      <module name="NessusRM" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="cn.viewcn.nessusrm.api.TxTansApi.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <list>
-      <item itemvalue="应用程序.TransApiTx" />
-      <item itemvalue="应用程序.Trans" />
-      <item itemvalue="应用程序.TransApiTx2" />
       <item itemvalue="应用程序.TxTransApi" />
-      <item itemvalue="应用程序.txSgin" />
       <item itemvalue="应用程序.MainScene" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="应用程序.TxTransApi" />
         <item itemvalue="应用程序.MainScene" />
-        <item itemvalue="应用程序.Trans" />
-        <item itemvalue="应用程序.txSgin" />
-        <item itemvalue="应用程序.TransApiTx2" />
+        <item itemvalue="应用程序.TxTransApi" />
       </list>
     </recent_temporary>
   </component>
@@ -222,7 +162,8 @@
       <workItem from="1682686524536" duration="1707000" />
       <workItem from="1682738399392" duration="2716000" />
       <workItem from="1684813463977" duration="210000" />
-      <workItem from="1684814021925" duration="1657000" />
+      <workItem from="1684814021925" duration="2990000" />
+      <workItem from="1705474587550" duration="4518000" />
     </task>
     <task id="LOCAL-00001" summary="完成ui第一版">
       <created>1682438268515</created>
@@ -252,7 +193,21 @@
       <option name="project" value="LOCAL" />
       <updated>1684814082526</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="更新">
+      <created>1684823827226</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1684823827226</updated>
+    </task>
+    <task id="LOCAL-00006" summary="更新">
+      <created>1684823837756</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1684823837756</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -13,10 +13,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Properties;
 
 import javafx.scene.control.ListView;
 import javafx.stage.Modality;
@@ -72,7 +74,7 @@ public class MainController {
     private void handleAddFile(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Add File");
-        // 创建文件过滤器，只接受 .txt 和 .pdf 文件
+        // 创建文件过滤器，只接受.csv文件
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("csv文件(*.csv)", "*.csv");
         fileChooser.getExtensionFilters().add(extFilter);
 

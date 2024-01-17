@@ -57,7 +57,7 @@
             <menus>
                 <Menu mnemonicParsing="false" text="设置">
                     <items>
-                        <MenuItem fx:id="txTranKeyMenu" mnemonicParsing="false" onAction="#setTxTranKey" text="TX翻译API" />
+                        <MenuItem fx:id="txTranKeyMenu" mnemonicParsing="false" onAction="#setTxTranKey" text="腾讯翻译API" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="关于" />
