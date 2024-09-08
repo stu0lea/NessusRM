@@ -1,0 +1,2 @@
+# aspose-words安装到本地仓库
+mvn install:install-file -Dfile=./aspose-words-21.1-jdk17-cracked.jar -DgroupId=com.aspose -DartifactId=aspose-words -Dversion=21.1.0 -Dpackaging=jar -Dclassifier=jdk17
