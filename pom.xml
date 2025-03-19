@@ -146,6 +146,7 @@
                 <executions>
                     <execution>
                         <id>make-assembly</id>
+                        <!--绑定到package，可以直接mvn package-->
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
