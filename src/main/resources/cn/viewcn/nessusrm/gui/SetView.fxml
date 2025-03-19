@@ -41,7 +41,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.viewcn.nessusrm.gui.SetController">
+<VBox alignment="CENTER" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.viewcn.nessusrm.gui.SetController">
    <children>
       <GridPane alignment="CENTER" maxWidth="600.0">
         <columnConstraints>
