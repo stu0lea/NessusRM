@@ -1,0 +1,20 @@
+
+/*@font-face {*/
+/*    src: url('fonts/SimHei.ttf');*/
+/*}*/
+
+* {
+    -fx-font-family: 'system';
+}
+
+.label{
+    -fx-font-size: 12;
+}
+
+.button{
+    -fx-font-size: 12;
+}
+
+.titled-pane{
+    -fx-font-size: 12;
+}

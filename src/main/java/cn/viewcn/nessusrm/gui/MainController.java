@@ -123,7 +123,7 @@ public class MainController {
 
     @FXML
     public void setTxTranKey(ActionEvent event) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(MainController.class.getResource("SetView.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/views/SetView.fxml"));
         Stage stage = new Stage();
         Scene scene = new Scene(fxmlLoader.load(), 400, 150);
         // 获取当前Stage
