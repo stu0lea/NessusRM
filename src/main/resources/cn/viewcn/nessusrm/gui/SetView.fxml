@@ -40,9 +40,13 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
 
 <VBox alignment="CENTER" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.viewcn.nessusrm.gui.SetController">
-   <children>
+    <stylesheets>
+        <URL value="@style.css"/>
+    </stylesheets>
+    <children>
       <GridPane alignment="CENTER" maxWidth="600.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="80.0" prefWidth="80.0" />

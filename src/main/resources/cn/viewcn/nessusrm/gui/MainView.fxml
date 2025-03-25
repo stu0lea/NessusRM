@@ -50,8 +50,12 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import java.net.URL?>
 
 <VBox fx:id="mainVbox" prefHeight="550.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.viewcn.nessusrm.gui.MainController">
+    <stylesheets>
+        <URL value="@style.css"/>
+    </stylesheets>
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>

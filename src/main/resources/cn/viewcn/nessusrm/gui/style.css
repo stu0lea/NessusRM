@@ -1,0 +1,11 @@
+
+@font-face {
+    src: url('fonts/SimHei.ttf');
+}
+
+* {
+    -fx-font-family: 'SimHei';
+}
+.label{
+    -fx-font-size: 11pt;
+}
