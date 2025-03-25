@@ -10,6 +10,7 @@ module cn.viewcn.nessusrm {
     requires java.xml.bind;
     requires org.apache.httpcomponents.httpcore;
     requires org.apache.httpcomponents.httpclient;
+    requires tablesaw.core;
 
     opens cn.viewcn.nessusrm.gui to javafx.fxml,java.activation,fastjson,org.apache.httpcomponents.httpclient,org.apache.httpcomponents.httpcore;
     exports cn.viewcn.nessusrm.gui;

@@ -1,0 +1,5 @@
+Plugin ID,CVE,CVSS v2.0 Base Score,Risk,Host,Protocol,Port,Name,Synopsis,Description,Solution,See Also,Plugin Output
+104743,,6.1,High,141.7.110.13,tcp,8089,TLS Version 1.0 Protocol Detection,remote service,test,test,test,test
+157288,,6.1,Medium,141.7.110.13,tcp,8089,TLS Version 1.1 Protocol Deprecated,remote service,test,test,test,test
+70658,CVE-2008-5161,2.6,Low,141.7.110.18,tcp,22,SSH Server CBC Mode Ciphers Enabled,remote service,test,test,test,test
+70658,CVE-2008-5161,2.6,Low,141.7.110.18,tcp,22,SSH Server CBC Mode Ciphers Enabled,remote service,test,test,test,test
