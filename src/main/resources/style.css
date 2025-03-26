@@ -3,9 +3,9 @@
 /*    src: url('fonts/SimHei.ttf');*/
 /*}*/
 
-* {
-    -fx-font-family: 'system';
-}
+/** {*/
+/*    -fx-font-family: 'system';*/
+/*}*/
 
 .label{
     -fx-font-size: 12;
