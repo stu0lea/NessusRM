@@ -3,6 +3,7 @@ package cn.viewcn.nessusrm.api;
 import okhttp3.*;
 
 import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -182,5 +183,14 @@ public class TxTransApi {
         SecretKeySpec secretKeySpec = new SecretKeySpec(key, mac.getAlgorithm());
         mac.init(secretKeySpec);
         return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static void main(String[] args) {
+        try {
+            JSONObject result = TxTransApi.translate("hello", "en", "zh");
+            System.out.println(result.toJSONString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
