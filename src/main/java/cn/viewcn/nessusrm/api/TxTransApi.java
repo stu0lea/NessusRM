@@ -1,72 +1,114 @@
 package cn.viewcn.nessusrm.api;
 
 import okhttp3.*;
-import com.google.gson.*;
+
+import javax.crypto.Mac;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.security.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Properties;
+import java.util.TimeZone;
+import com.alibaba.fastjson.JSONObject;
 
-public class Translator {
+
+public class TxTransApi {
+    // 从配置文件读取的密钥
     private static String secretId;
     private static String secretKey;
-    private static final Gson gson = new Gson();
 
+    // 加载配置文件
     static {
         loadConfig();
     }
 
-    // 加载配置文件（保持不变）
-    private static void loadConfig() { /* 同上，略 */ }
-
-    /**
-     * 翻译方法（返回解析后的JsonObject）
-     * @param sourceText 原文
-     * @param sourceLang 源语言（如"en"）
-     * @param targetLang 目标语言（如"zh"）
-     * @return 解析后的JSON对象
-     */
-    public static JsonObject translate(String sourceText, String sourceLang, String targetLang)
-            throws TranslationException {
-        try {
-            String body = String.format(
-                    "{\"SourceText\":\"%s\",\"Source\":\"%s\",\"Target\":\"%s\",\"ProjectId\":0}",
-                    sourceText, sourceLang, targetLang
-            );
-
-            String jsonResponse = doRequest(
-                    secretId, secretKey,
-                    "tmt", "2018-03-21", "TextTranslate",
-                    body, "ap-beijing", ""
-            );
-
-            return parseJsonResponse(jsonResponse);
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new TranslationException("请求失败: " + e.getMessage(), e);
+    // 加载config.ini
+    private static void loadConfig() {
+        Properties prop = new Properties();
+        try (InputStream input = Files.newInputStream(Paths.get("config.ini"))) {
+            prop.load(input);
+            secretId = prop.getProperty("secretId");
+            secretKey = prop.getProperty("secretKey");
+        } catch (IOException ex) {
+            throw new RuntimeException("无法加载配置文件 config.ini", ex);
         }
     }
 
     /**
-     * 解析API返回的JSON字符串为JsonObject
+     * 对外提供的翻译方法
+     * @param sourceText 需要翻译的文本
+     * @param sourceLang 源语言代码（如"en"）
+     * @param targetLang 目标语言代码（如"zh"）
+     * @return API响应结果
      */
-    private static JsonObject parseJsonResponse(String jsonResponse) throws TranslationException {
-        try {
-            return gson.fromJson(jsonResponse, JsonObject.class);
-        } catch (JsonSyntaxException e) {
-            throw new TranslationException("JSON解析失败: " + e.getMessage(), e);
+    public static JSONObject translate(String sourceText, String sourceLang, String targetLang)
+            throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+
+        String body = String.format(
+                "{\"SourceText\":\"%s\",\"Source\":\"%s\",\"Target\":\"%s\",\"ProjectId\":0}",
+                sourceText, sourceLang, targetLang
+        );
+
+        return doRequest(
+                secretId,
+                secretKey,
+                "tmt",        // 服务名称
+                "2018-03-21", // API版本
+                "TextTranslate",
+                body,
+                "ap-beijing", // 地域
+                ""            // token（无token留空）
+        );
+    }
+
+    // 以下是原有逻辑保持不变（略作整理）
+
+    private static final OkHttpClient client = new OkHttpClient();
+
+    private static JSONObject doRequest(
+            String secretId, String secretKey,
+            String service, String version, String action,
+            String body, String region, String token
+    ) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        Request request = buildRequest(secretId, secretKey, service, version, action, body, region, token);
+        try (Response response = client.newCall(request).execute()) {
+            String result =  response.body().string();
+            return JSONObject.parseObject(result);
         }
     }
 
-    // 自定义异常类（封装所有可能的错误）
-    public static class TranslationException extends Exception {
-        public TranslationException(String message, Throwable cause) {
-            super(message, cause);
-        }
+    private static Request buildRequest(
+            String secretId, String secretKey,
+            String service, String version, String action,
+            String body, String region, String token
+    ) throws NoSuchAlgorithmException, InvalidKeyException {
+        String host = "tmt.tencentcloudapi.com";
+        String endpoint = "https://" + host;
+        String contentType = "application/json; charset=utf-8";
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+        String auth = getAuth(secretId, secretKey, host, contentType, timestamp, body);
+
+        return new Request.Builder()
+                .header("Host", host)
+                .header("X-TC-Timestamp", timestamp)
+                .header("X-TC-Version", version)
+                .header("X-TC-Action", action)
+                .header("X-TC-Region", region)
+                .header("X-TC-Token", token)
+                .header("X-TC-RequestClient", "SDK_JAVA_BAREBONE")
+                .header("Authorization", auth)
+                .url(endpoint)
+                .post(RequestBody.create(body, MediaType.parse(contentType)))
+                .build();
     }
 
-    // 其余网络请求方法（doRequest/buildRequest/getAuth等保持不变）
+    // 其他辅助方法保持不变...
+    // (包括 getAuth, sha256Hex, printHexBinary, hmac256)
     private static String getAuth(
             String secretId, String secretKey, String host, String contentType,
             String timestamp, String body
