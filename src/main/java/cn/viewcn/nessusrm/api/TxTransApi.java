@@ -21,6 +21,9 @@ public class TxTransApi {
     // 从配置文件读取的密钥
     private static String secretId;
     private static String secretKey;
+    // 默认源语言设为自动检测，目标语言设为英语
+    private static final String DEFAULT_SOURCE_LANG = "en";
+    private static final String DEFAULT_TARGET_LANG = "zh";
     // 加载配置文件
     static {
         loadConfig();
@@ -65,6 +68,10 @@ public class TxTransApi {
         );
     }
 
+    // 重载版本1：自动检测源语言 + 英语目标语言
+    public static String translate(String sourceText) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        return translate(sourceText, DEFAULT_SOURCE_LANG, DEFAULT_TARGET_LANG);
+    }
     // 以下是原有逻辑保持不变（略作整理）
 
     private static final OkHttpClient client = new OkHttpClient();

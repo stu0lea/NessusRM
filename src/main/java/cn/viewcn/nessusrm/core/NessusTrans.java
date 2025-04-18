@@ -34,7 +34,7 @@ public class NessusTrans {
 
     public void transUseTenable() throws IOException {
         String pluginId = csvRow.get("Plugin ID");
-        Map<String, Object> tenableData = gson.fromJson(TenableTransApi.trans(pluginId), new TypeToken<Map<String, Object>>() {}.getType()
+        Map<String, Object> tenableData = gson.fromJson(TenableTransApi.translate(pluginId), new TypeToken<Map<String, Object>>() {}.getType()
         );
         transResult.put("plugin_name_cn", tenableData.get("script_name"));
         transResult.put("synopsis_cn", delNewlines((String) tenableData.get("synopsis")));

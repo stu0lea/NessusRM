@@ -33,7 +33,7 @@ public class TenableTransApi {
         }
     }
 
-    public static String trans(String pluginId) throws IOException {
+    public static String translate(String pluginId) throws IOException {
         String token = getToken();
         System.out.println("Token:"+token);
         String url = String.format("https://zh-cn.tenable.com/_next/data/%s/zh-CN/plugins/nessus/%s.json?type=nessus&id=%s",
@@ -66,7 +66,7 @@ public class TenableTransApi {
 
     public static void main(String[] args) {
         try {
-            String result = TenableTransApi.trans("159826");
+            String result = TenableTransApi.translate("159826");
             System.out.println(result);
         } catch (IOException e) {
             e.printStackTrace();

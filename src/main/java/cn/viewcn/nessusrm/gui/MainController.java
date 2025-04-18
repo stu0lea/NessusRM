@@ -100,9 +100,8 @@ public class MainController {
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 //        String dateString = checkDate.getValue().format(formatter);
 //        System.out.println(dateString); // 输出格式为 yyyy-MM-dd 的日期字符
-        TxTransApi t = new TxTransApi();
         try {
-            String res = t.translate("test","en","zh");
+            String res = TxTransApi.translate("test","en","zh");
             System.out.println(res);
         } catch (Exception e) {
             System.err.println("Error occurred while calling translation API: " + e.getMessage());
