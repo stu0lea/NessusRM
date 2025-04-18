@@ -1,7 +1,8 @@
 package cn.viewcn.nessusrm.gui;
 
 import cn.viewcn.nessusrm.api.TxTransApi;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,12 +14,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Properties;
 
 import javafx.scene.control.ListView;
 import javafx.stage.Modality;
@@ -103,8 +102,8 @@ public class MainController {
 //        System.out.println(dateString); // 输出格式为 yyyy-MM-dd 的日期字符
         TxTransApi t = new TxTransApi();
         try {
-            JSONObject res = t.translate("test","en","zh");
-            System.out.println(res.toJSONString());
+            String res = t.translate("test","en","zh");
+            System.out.println(res);
         } catch (Exception e) {
             System.err.println("Error occurred while calling translation API: " + e.getMessage());
         }

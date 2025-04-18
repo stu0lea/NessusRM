@@ -15,14 +15,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.TimeZone;
-import com.alibaba.fastjson.JSONObject;
 
 
 public class TxTransApi {
     // 从配置文件读取的密钥
     private static String secretId;
     private static String secretKey;
-
     // 加载配置文件
     static {
         loadConfig();
@@ -47,7 +45,7 @@ public class TxTransApi {
      * @param targetLang 目标语言代码（如"zh"）
      * @return API响应结果
      */
-    public static JSONObject translate(String sourceText, String sourceLang, String targetLang)
+    public static String translate(String sourceText, String sourceLang, String targetLang)
             throws IOException, NoSuchAlgorithmException, InvalidKeyException {
 
         String body = String.format(
@@ -71,15 +69,14 @@ public class TxTransApi {
 
     private static final OkHttpClient client = new OkHttpClient();
 
-    private static JSONObject doRequest(
+    private static String doRequest(
             String secretId, String secretKey,
             String service, String version, String action,
             String body, String region, String token
     ) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         Request request = buildRequest(secretId, secretKey, service, version, action, body, region, token);
         try (Response response = client.newCall(request).execute()) {
-            String result =  response.body().string();
-            return JSONObject.parseObject(result);
+            return response.body().string();
         }
     }
 
@@ -185,10 +182,11 @@ public class TxTransApi {
         return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
     }
 
+
     public static void main(String[] args) {
         try {
-            JSONObject result = TxTransApi.translate("hello", "en", "zh");
-            System.out.println(result.toJSONString());
+            String result = TxTransApi.translate("hello", "en", "zh");
+            System.out.println(result);
         } catch (Exception e) {
             e.printStackTrace();
         }
