@@ -103,7 +103,7 @@ public class MainController {
 //        System.out.println(dateString); // 输出格式为 yyyy-MM-dd 的日期字符
         TxTransApi t = new TxTransApi();
         try {
-            JSONObject res = t.translate("test");
+            JSONObject res = t.translate("test","en","zh");
             System.out.println(res.toJSONString());
         } catch (Exception e) {
             System.err.println("Error occurred while calling translation API: " + e.getMessage());
