@@ -15,13 +15,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.TimeZone;
-
-
+import org.apache.commons.text.StringEscapeUtils;
+/**
+ * 腾讯云机器翻译API官方提供的http请求示例
+ * https://console.cloud.tencent.com/tmt
+ */
 public class TxTransApi {
     // 从配置文件读取的密钥
     private static String secretId;
     private static String secretKey;
-    // 默认源语言设为自动检测，目标语言设为英语
+    // 默认源语言en，目标语言设为zh
     private static final String DEFAULT_SOURCE_LANG = "en";
     private static final String DEFAULT_TARGET_LANG = "zh";
     // 加载配置文件
@@ -32,12 +35,12 @@ public class TxTransApi {
     // 加载config.ini
     private static void loadConfig() {
         Properties prop = new Properties();
-        try (InputStream input = Files.newInputStream(Paths.get("config.ini"))) {
+        try (InputStream input = Files.newInputStream(Paths.get("config.properties"))) {
             prop.load(input);
-            secretId = prop.getProperty("secretId");
-            secretKey = prop.getProperty("secretKey");
+            secretId = prop.getProperty("txApiId");
+            secretKey = prop.getProperty("txApiKey");
         } catch (IOException ex) {
-            throw new RuntimeException("无法加载配置文件 config.ini", ex);
+            throw new RuntimeException("从配置文件中读取翻译APIsecretId/secretKey失败！", ex);
         }
     }
 
@@ -50,12 +53,11 @@ public class TxTransApi {
      */
     public static String translate(String sourceText, String sourceLang, String targetLang)
             throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-
+        // StringEscapeUtils.escapeJava转义换行符\n，翻译后保留换行符。
         String body = String.format(
                 "{\"SourceText\":\"%s\",\"Source\":\"%s\",\"Target\":\"%s\",\"ProjectId\":0}",
                 sourceText, sourceLang, targetLang
         );
-
         return doRequest(
                 secretId,
                 secretKey,
@@ -68,7 +70,7 @@ public class TxTransApi {
         );
     }
 
-    // 重载版本1：自动检测源语言 + 英语目标语言
+    // 未设置语言类型默认
     public static String translate(String sourceText) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         return translate(sourceText, DEFAULT_SOURCE_LANG, DEFAULT_TARGET_LANG);
     }
@@ -189,7 +191,6 @@ public class TxTransApi {
         return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
     }
 
-
     public static void main(String[] args) {
         try {
             String result = TxTransApi.translate("hello", "en", "zh");
@@ -197,5 +198,6 @@ public class TxTransApi {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // 结果：{"Response":{"RequestId":"ed8da4d3-40c7-4cf9-bc34-c3bad918f131","Source":"en","Target":"zh","TargetText":"你好","UsedAmount":5}}
     }
 }

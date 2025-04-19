@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class SetController {
     private void configReader() {
         Properties properties = new Properties();
         try {
-            FileInputStream fileInputStream = new FileInputStream("config.ini");
+            FileInputStream fileInputStream = new FileInputStream("config.properties");
             properties.load(fileInputStream);
             fileInputStream.close();
         } catch (IOException e) {
@@ -43,18 +44,29 @@ public class SetController {
 
     @FXML
     void txApiButton(ActionEvent event) {
-
-    // 创建一个Properties对象
         Properties props = new Properties();
-        // 设置txApiId和txApiKey的值
+        File configFile = new File("config.properties");
+
+        // 如果配置文件已存在，先加载现有配置
+        if (configFile.exists()) {
+            try (FileInputStream in = new FileInputStream(configFile)) {
+                props.load(in);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 更新/添加需要修改的配置项
         props.setProperty("txApiId", txApiId.getText());
         props.setProperty("txApiKey", txApiKey.getText());
-        // 将Properties对象写入config.ini文件
-        try {
-            props.store(new FileOutputStream("config.ini"), "TX API Config");
+
+        // 保存配置（保留注释和原有配置）
+        try (FileOutputStream out = new FileOutputStream(configFile)) {
+            props.store(out, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         Stage stage = (Stage) txApiButton.getScene().getWindow();
         stage.close();
     }

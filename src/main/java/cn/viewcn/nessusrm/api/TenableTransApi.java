@@ -55,7 +55,7 @@ public class TenableTransApi {
             JsonObject pluginData = pageProps.getAsJsonObject("plugin");
 
             if (pluginData != null && !pluginData.isJsonNull()) {
-                return pluginData.getAsString();
+                return pluginData.toString();
             } else {
                 throw new IOException("Plugin data not found in response");
             }
