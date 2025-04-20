@@ -4,14 +4,11 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-
+import com.google.gson.JsonParser;
 
 public class TenableTransApi {
     private static final OkHttpClient client = new OkHttpClient();
-    private static final Gson gson = new Gson();
     private static final Pattern BUILD_ID_PATTERN = Pattern.compile("\"buildId\":\"([a-zA-Z0-9_-]+)\"");
 
     public static String getToken() throws IOException {
@@ -21,21 +18,24 @@ public class TenableTransApi {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
+            if (!response.isSuccessful()) {
+                String errorMessage = "获取token请求错误：" + response;
+                throw new IOException(errorMessage);
+            }
             String responseBody = response.body().string();
             Matcher matcher = BUILD_ID_PATTERN.matcher(responseBody);
             if (matcher.find()) {
                 return matcher.group(1);
             } else {
-                throw new IOException("Token not found in response");
+                String errorMessage = "未在响应体中发现tenable的token";
+                throw new IOException(errorMessage);
             }
         }
     }
 
     public static String translate(String pluginId) throws IOException {
         String token = getToken();
-        System.out.println("Token:"+token);
+        System.out.println("Token:" + token);
         String url = String.format("https://zh-cn.tenable.com/_next/data/%s/zh-CN/plugins/nessus/%s.json?type=nessus&id=%s",
                 token, pluginId, pluginId);
 
@@ -46,21 +46,17 @@ public class TenableTransApi {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response.code());
+                throw new IOException("获取Plugin数据请求错误：" + response);
             }
-
-            String jsonData = response.body().string();
-            JsonObject jsonObject = gson.fromJson(jsonData, JsonObject.class);
-            JsonObject pageProps = jsonObject.getAsJsonObject("pageProps");
-            JsonObject pluginData = pageProps.getAsJsonObject("plugin");
-
-            if (pluginData != null && !pluginData.isJsonNull()) {
+            try {
+                String jsonData = response.body().string();
+                JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
+                JsonObject pageProps = jsonObject.getAsJsonObject("pageProps");
+                JsonObject pluginData = pageProps.getAsJsonObject("plugin");
                 return pluginData.toString();
-            } else {
-                throw new IOException("Plugin data not found in response");
+            } catch (Exception e) {
+                throw new IOException("响应体json数据格式错误", e);
             }
-        } catch (JsonSyntaxException e) {
-            throw new IOException("Invalid JSON response", e);
         }
     }
 

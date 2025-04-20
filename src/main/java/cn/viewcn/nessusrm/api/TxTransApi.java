@@ -13,20 +13,24 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.TimeZone;
 import org.apache.commons.text.StringEscapeUtils;
 /**
  * 腾讯云机器翻译API官方提供的http请求示例
- * https://console.cloud.tencent.com/tmt
+ * <a href="https://console.cloud.tencent.com/tmt">...</a>
  */
 public class TxTransApi {
+
     // 从配置文件读取的密钥
     private static String secretId;
     private static String secretKey;
+
     // 默认源语言en，目标语言设为zh
     private static final String DEFAULT_SOURCE_LANG = "en";
     private static final String DEFAULT_TARGET_LANG = "zh";
+
     // 加载配置文件
     static {
         loadConfig();
@@ -39,13 +43,17 @@ public class TxTransApi {
             prop.load(input);
             secretId = prop.getProperty("txApiId");
             secretKey = prop.getProperty("txApiKey");
+            if ((secretId == null || secretId.trim().isEmpty()) || (secretKey == null || secretKey.trim().isEmpty())) {
+                String errorMessage = "配置文件中未找到有效的secretId或secretKey";
+                throw new RuntimeException(errorMessage);
+            }
         } catch (IOException ex) {
-            throw new RuntimeException("从配置文件中读取翻译APIsecretId/secretKey失败！", ex);
+            String errorMessage = "从配置文件中读取翻译API secretId/secretKey 失败!";
+            throw new RuntimeException(errorMessage, ex);
         }
     }
-
     /**
-     * 对外提供的翻译方法
+     * 自定义对外提供的翻译方法
      * @param sourceText 需要翻译的文本
      * @param sourceLang 源语言代码（如"en"）
      * @param targetLang 目标语言代码（如"zh"）
@@ -56,7 +64,7 @@ public class TxTransApi {
         // StringEscapeUtils.escapeJava转义换行符\n，翻译后保留换行符。
         String body = String.format(
                 "{\"SourceText\":\"%s\",\"Source\":\"%s\",\"Target\":\"%s\",\"ProjectId\":0}",
-                sourceText, sourceLang, targetLang
+                StringEscapeUtils.escapeJava(sourceText), sourceLang, targetLang
         );
         return doRequest(
                 secretId,
@@ -74,8 +82,8 @@ public class TxTransApi {
     public static String translate(String sourceText) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         return translate(sourceText, DEFAULT_SOURCE_LANG, DEFAULT_TARGET_LANG);
     }
-    // 以下是原有逻辑保持不变（略作整理）
 
+    // 下面部分代码是腾讯翻译提供的http请求示例
     private static final OkHttpClient client = new OkHttpClient();
 
     private static String doRequest(
@@ -114,8 +122,6 @@ public class TxTransApi {
                 .build();
     }
 
-    // 其他辅助方法保持不变...
-    // (包括 getAuth, sha256Hex, printHexBinary, hmac256)
     private static String getAuth(
             String secretId, String secretKey, String host, String contentType,
             String timestamp, String body

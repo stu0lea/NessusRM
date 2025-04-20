@@ -13,6 +13,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class NessusTrans {
     private static final Gson gson = new Gson();
@@ -26,7 +29,7 @@ public class NessusTrans {
         put("Info", "信息");
         put("None", "信息");
     }};
-
+//    private static final Logger logger = LoggerFactory.getLogger(TenableTransApi.class);?
     public NessusTrans(Map<String, String> csvRow) {
         this.csvRow = csvRow;
     }
@@ -90,7 +93,7 @@ public class NessusTrans {
         transResult.put("solution_cn", delNewlines((String) tenableData.get("solution")));
     }
 
-    public void transUseTx() throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public void transUseTx() {
         // 使用腾讯翻译api翻译
         transResult.put("plugin_name_cn", TxTransSplitApi.translate(csvRow.get("Name")));
         transResult.put("risk_cn", riskMap.get(csvRow.get("Risk")));
@@ -122,6 +125,7 @@ public class NessusTrans {
                 System.err.println("官方API错误: " + ex.getMessage());
                 try {
                     // 这里应添加腾讯翻译API调用
+                    // 这里无论翻译是否成功均会返回原文
                     transUseTx();
                     Thread.sleep(1000);
                 } catch (Exception exc) {
@@ -152,5 +156,5 @@ public class NessusTrans {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    };
+    }
 }
