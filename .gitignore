@@ -32,4 +32,4 @@ config.ini
 note.txt
 *.sql
 *.csv
-.gitignore
+**/.gitignore
