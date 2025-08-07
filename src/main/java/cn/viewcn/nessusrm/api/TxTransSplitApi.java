@@ -1,11 +1,8 @@
 package cn.viewcn.nessusrm.api;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -63,7 +60,6 @@ public class TxTransSplitApi {
         }
         return response.get("TargetText").getAsString();
     }
-
 
     public static void main(String[] args) {
             String test_text= "The lawsuit that resulted in Saturday's order said the Venezuelans detained in north Texas had been given notices about their imminent deportation in English \n\n  despite one detainee only speaking Spanish.";
