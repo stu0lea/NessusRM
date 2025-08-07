@@ -98,6 +98,63 @@
             <version>3.41.2.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.j256.ormlite</groupId>
+            <artifactId>ormlite-jdbc</artifactId>
+            <version>6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.j256.ormlite</groupId>
+            <artifactId>ormlite-core</artifactId>
+            <version>6.1</version>
+        </dependency>
+        <!-- 用于CSV解析 -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.7.1</version>
+        </dependency>
+
+        <!-- 用于Word报告生成 -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.8</version> <!-- 版本号根据实际情况选择 -->
+        </dependency>
+
+        <!-- JFreeChart 核心库 -->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.4</version> <!-- 使用最新版本 -->
+        </dependency>
+
+        <!-- JCommon 库（JFreeChart 的依赖） -->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jcommon</artifactId>
+            <version>1.0.24</version> <!-- 使用最新版本 -->
+        </dependency>
+
+        <!-- 图表导出为图像 -->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>org.jfree.chart.fx</artifactId>
+            <version>2.0.1</version> <!-- 可选，用于 JavaFX 集成 -->
+        </dependency>
+
         <!--        后续增加的依赖-->
     </dependencies>
 

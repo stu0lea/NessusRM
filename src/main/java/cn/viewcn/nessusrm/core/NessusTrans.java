@@ -1,13 +1,12 @@
 package cn.viewcn.nessusrm.core;
 
 import cn.viewcn.nessusrm.api.TenableTransApi;
-import cn.viewcn.nessusrm.api.TxTransApi;
 import cn.viewcn.nessusrm.api.TxTransSplitApi;
+import cn.viewcn.nessusrm.orm.DatabaseConnect;
+import cn.viewcn.nessusrm.orm.PluginTranslation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class NessusTrans {
     private static final Gson gson = new Gson();
     private final Map<String, String> csvRow;
-    private Map<String, Object> transResult = new HashMap<>();
+    private final Map<String, Object> transResult = new HashMap<>();
     private static final Map<String, String> riskMap = new HashMap<String, String>() {{
         put("Critical", "严重");
         put("High", "高危");
@@ -52,33 +51,34 @@ public class NessusTrans {
     }
 
     public void transUseDb() throws SQLException {
-        // 使用本地数据库存储的中文漏洞库翻译
+        PluginTranslation translation = DatabaseConnect.getByPluginId(csvRow.get("Plugin ID"));
 
-        String sql = "SELECT * FROM nessus_trans_plugin WHERE plugin_id = ?";
+        if (translation != null) {
+            // 将PluginTranslation对象转换为Map
+            transResult.put("plugin_id", translation.getPluginId());
+            transResult.put("cve", translation.getCve());
+            transResult.put("cvss", translation.getCvss());
+            transResult.put("risk", translation.getRisk());
+            transResult.put("plugin_name", translation.getPluginName());
+            transResult.put("synopsis", translation.getSynopsis());
+            transResult.put("description", translation.getDescription());
+            transResult.put("solution", translation.getSolution());
+            transResult.put("upload_date", translation.getUploadDate());
+            transResult.put("plugin_name_cn", translation.getPluginNameCn());
+            transResult.put("risk_cn", translation.getRiskCn());
+            transResult.put("synopsis_cn", translation.getSynopsisCn());
+            transResult.put("description_cn", translation.getDescriptionCn());
+            transResult.put("solution_cn", translation.getSolutionCn());
 
-        // try-with-resources 自动关闭连接、语句和结果集
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:nessus_trans_plugin.sqlite");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            String dbRisk = translation.getRisk();
+            String csvRisk = csvRow.get("Risk");
 
-            pstmt.setString(1, csvRow.get("Plugin ID"));
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                transResult = toMap(rs); // 直接转换结果集为 Map
-                String dbRisk = (String) transResult.get("risk");
-                String csvRisk = csvRow.get("Risk");
-
-                if (!dbRisk.equals(csvRisk)) {
-                    transResult.put("risk_cn", riskMap.getOrDefault(csvRisk, ""));
-                }
+            if (!dbRisk.equals(csvRisk)) {
+                transResult.put("risk_cn", riskMap.getOrDefault(csvRisk, ""));
             }
-            else {
-                throw new SQLException("Plugin ID在数据中未查询到！");
-            }
-
-        } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+        } else {
+            throw new SQLException("Plugin ID在数据中未查询到！");
         }
-
     }
 
     public void transUseTenable() throws IOException {
@@ -103,44 +103,54 @@ public class NessusTrans {
     }
 
     public Map<String, Object> transMain() {
+        // 翻译执行顺序：本地库 or 官方中文API or 腾讯翻译API -> 翻译结果存储到本地库
         try {
-            // 这里应添加数据库查询逻辑
+            // 1.本地库翻译
              transUseDb();
         } catch (Exception e) {
             System.err.println("数据库翻译错误: " + e.getMessage());
             // 以下是原始英文漏洞信息，原封不动传递给transResult，准备存储到本地库中。
             transResult.put("plugin_id", csvRow.get("Plugin ID"));
-            transResult.put("cve", riskMap.get(csvRow.get("CVE")));
-            transResult.put("cvss", riskMap.get(csvRow.get("CVSS v2.0 Base Score")));
-            transResult.put("risk", riskMap.get(csvRow.get("Risk")));
-            transResult.put("plugin_name", riskMap.get(csvRow.get("Name")));
-            transResult.put("synopsis", riskMap.get(csvRow.get("Synopsis")));
-            transResult.put("description", riskMap.get(csvRow.get("Description")));
-            transResult.put("solution", riskMap.get(csvRow.get("Solution")));
+            transResult.put("cve", csvRow.get("CVE"));
+            transResult.put("cvss", csvRow.get("CVSS v2.0 Base Score"));
+            transResult.put("risk", csvRow.get("Risk"));
+            transResult.put("risk_cn", riskMap.get(csvRow.get("Risk"))); // 无需翻译直接从riskMap获取
+            transResult.put("plugin_name",csvRow.get("Name"));
+            transResult.put("synopsis", csvRow.get("Synopsis"));
+            transResult.put("description", csvRow.get("Description"));
+            transResult.put("solution",csvRow.get("Solution"));
             transResult.put("upload_date", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
             try {
+                // 2.Nessus官方API翻译
                 transUseTenable();
                 Thread.sleep(500);
             } catch (Exception ex) {
                 System.err.println("官方API错误: " + ex.getMessage());
                 try {
-                    // 这里应添加腾讯翻译API调用
-                    // 这里无论翻译是否成功均会返回原文
+                    // 3.腾讯翻译API, 无论翻译是否成功均会返回原文
                     transUseTx();
                     Thread.sleep(1000);
                 } catch (Exception exc) {
                     System.err.println("腾讯翻译错误: " + exc.getMessage());
                 }
             }
-            // 这里应添加数据库存储逻辑
+            // 将翻译后的数据存储到本地数据库
+            try {
+                // 创建实体对象
+                PluginTranslation translation = new PluginTranslation(transResult);
+                // 保存到数据库
+                DatabaseConnect.saveOrUpdate(translation);
+            } catch (Exception ex) {
+                System.err.println("保存到数据库失败: " + ex.getMessage());
+            }
         }
         return transResult;
     }
 
     public static void main(String[] args) {
-//        测试
+    // 测试 中文官方id：95633
         Map<String, String> testData = new HashMap<String, String>() {{
-                put("Plugin ID", "999999");
+                put("Plugin ID", "95633");
                 put("CVE", "CVE-2005-1794");
                 put("CVSS v2.0 Base Score", "5.1");
                 put("Risk", "High");

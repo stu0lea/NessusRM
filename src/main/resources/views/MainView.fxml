@@ -97,16 +97,16 @@
                         <Label text="开始日期" GridPane.rowIndex="4" />
                         <Label text="结束日期" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                         <Label text="*CSV文件" GridPane.rowIndex="5" />
-                        <TextField fx:id="systemName" GridPane.columnIndex="1" GridPane.columnSpan="3" />
+                        <TextField fx:id="systemName" GridPane.columnIndex="1" GridPane.columnSpan="3" styleClass="required"/>
                         <TextField fx:id="createPerson" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <TextField fx:id="checkPerson" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                         <TextField fx:id="permitPerson" GridPane.columnIndex="5" GridPane.rowIndex="1" />
                         <DatePicker fx:id="createDate" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <DatePicker fx:id="checkDate" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                         <DatePicker fx:id="permitDate" maxWidth="1.7976931348623157E308" GridPane.columnIndex="5" GridPane.rowIndex="2" />
-                        <HBox alignment="CENTER_LEFT" nodeOrientation="LEFT_TO_RIGHT" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
+                        <HBox fx:id="riskSelect" alignment="CENTER_LEFT" nodeOrientation="LEFT_TO_RIGHT" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
                             <children>
-                                <CheckBox mnemonicParsing="false" selected="true" text="严重" textAlignment="CENTER" wrapText="true">
+                                <CheckBox mnemonicParsing="false" selected="true" text="严重" userData="Critical" textAlignment="CENTER" wrapText="true">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -114,22 +114,22 @@
                                         <Insets right="10.0" />
                                     </HBox.margin>
                                 </CheckBox>
-                                <CheckBox mnemonicParsing="false" selected="true" text="高危">
+                                <CheckBox mnemonicParsing="false" selected="true" text="高危"  userData="High" >
                                     <padding>
                                         <Insets right="10.0" />
                                     </padding>
                                 </CheckBox>
-                                <CheckBox mnemonicParsing="false" selected="true" text="中危">
+                                <CheckBox mnemonicParsing="false" selected="true" text="中危" userData="Medium">
                                     <padding>
                                         <Insets right="10.0" />
                                     </padding>
                                 </CheckBox>
-                                <CheckBox mnemonicParsing="false" selected="true" text="低危">
+                                <CheckBox mnemonicParsing="false" selected="true" text="低危" userData="Low">
                                     <padding>
                                         <Insets right="10.0" />
                                     </padding>
                                 </CheckBox>
-                                <CheckBox mnemonicParsing="false" text="信息">
+                                <CheckBox mnemonicParsing="false" text="信息" userData="None">
                                     <padding>
                                         <Insets right="10.0" />
                                     </padding>
@@ -198,7 +198,7 @@
                                                                 <TextField fx:id="projectName" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                                                                 <TextField fx:id="customEmail" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                                                 <TextField fx:id="customPhone" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                                                                <TextField fx:id="ourPerson" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                                <TextField fx:id="ourContact" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                                                 <TextField fx:id="ourEmail" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                                                 <TextField fx:id="ourPhone" GridPane.columnIndex="3" GridPane.rowIndex="5" />
                                                                 <TextField fx:id="ourTestPerson" GridPane.columnIndex="3" GridPane.rowIndex="6" />

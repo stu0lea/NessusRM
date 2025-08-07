@@ -1,30 +1,41 @@
 package cn.viewcn.nessusrm.gui;
 
-import cn.viewcn.nessusrm.api.TxTransApi;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
+import java.io.File;
+import cn.viewcn.nessusrm.core.MakeReport;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-
-import java.io.File;
+import javafx.application.Platform;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import javafx.scene.control.ListView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import javafx.concurrent.Task;
+import java.util.stream.Collectors;
+import tech.tablesaw.api.Table;
+
 
 public class MainController {
 
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @FXML
     public VBox mainVbox;
@@ -35,11 +46,15 @@ public class MainController {
     @FXML
     private TextField systemName, createPerson, checkPerson, permitPerson;
 
+    // 注入 CheckBox 容器
+    @FXML
+    private HBox riskSelect;
+
     @FXML
     private DatePicker createDate, checkDate, permitDate, startDate, endDate;
 
     @FXML
-    private TextField unitName, unitAddress, customContacts, projectName, customEmail, customPhone, ourPerson, ourEmail, ourPhone, ourTestPerson;
+    private TextField unitName, unitAddress, customContacts, projectName, customEmail, customPhone, ourContact, ourEmail, ourPhone, ourTestPerson;
 
     @FXML
     private ListView<File> fileListView;
@@ -93,30 +108,177 @@ public class MainController {
         fileList.removeAll(fileListView.getSelectionModel().getSelectedItems());
     }
 
-    @FXML
-    @Deprecated
-    private void handleSubmitAction(ActionEvent event) {
-//         TODO: Submit files
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//        String dateString = checkDate.getValue().format(formatter);
-//        System.out.println(dateString); // 输出格式为 yyyy-MM-dd 的日期字符
-        try {
-            String res = TxTransApi.translate("test","en","zh");
-            System.out.println(res);
-        } catch (Exception e) {
-            System.err.println("Error occurred while calling translation API: " + e.getMessage());
-        }
-        fileList.clear();
-    }
 
     @FXML
     @Deprecated
-    private void handleClearButtonAction(ActionEvent event) {
-        systemName.clear();
-        createPerson.clear();
-        checkPerson.clear();
-        permitPerson.clear();
-        fileList.clear();
+    private void handleSubmitAction(ActionEvent event) {
+        // 验证输入
+        if (systemName.getText().isEmpty()) {
+            showAlert("错误", "系统名称必须填写", Alert.AlertType.ERROR);
+            return;
+        }
+        if (fileList.isEmpty()) {
+            showAlert("错误", "请至少添加一个CSV文件", Alert.AlertType.ERROR);
+            return;
+        }
+
+        // 收集表单数据
+        Map<String, String> formData = collectFormData();
+        System.out.println(formData);
+
+        try {
+            // 加载进度窗口FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ProgressDialog.fxml"));
+            Parent progressRoot = loader.load();
+            ProgressDialogController progressController = loader.getController();
+
+            // 配置进度窗口Stage
+            Stage progressStage = new Stage();
+            progressStage.setTitle("生成安全报告");
+            progressStage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            progressStage.initModality(Modality.APPLICATION_MODAL);
+            progressStage.setScene(new Scene(progressRoot, 400, 200));
+            progressController.setDialogStage(progressStage);
+
+            // 创建后台任务
+            Task<Void> reportTask = new Task<Void>() {
+                private Path savedPath;
+
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        MakeReport makeReport = new MakeReport(formData);
+                        // 步骤1: 合并CSV文件
+                        updateMessage("正在合并CSV文件...");
+                        updateProgress(0, 1);
+                        List<File> files = new ArrayList<>(fileList);
+                        Table mergedTable = makeReport.mergeAndCleanCsvFiles(files);
+                        System.out.println(mergedTable);
+                        Thread.sleep(500);
+
+                        // 步骤2: 翻译漏洞信息
+                        updateMessage("正在翻译漏洞信息...");
+                        updateProgress(0.3, 1);
+//                        Table translatedTable = makeReport.translateVulnerabilities(mergedTable);
+                        Thread.sleep(500);
+
+                        // 步骤3: 分析数据
+                        updateMessage("正在分析漏洞数据...");
+                        updateProgress(0.6, 1);
+//                        Map<String, Object> analysisResults = makeReport.analyzeVulnerabilityData(translatedTable);
+                        Thread.sleep(500);
+
+                        // 步骤4: 生成报告
+                        updateMessage("正在生成报告...");
+                        updateProgress(0.8, 1);
+//                        byte[] zipBytes = makeReport.generateZipReport(translatedTable, analysisResults, formData);
+                        Thread.sleep(500);
+
+                        // 步骤5: 保存报告
+                        updateMessage("正在保存报告...");
+                        updateProgress(0.95, 1);
+//                        savedPath = makeReport.saveReport(zipBytes, formData.get("system_name"));
+                        Thread.sleep(500);
+                        // 完成
+                        updateMessage("报告生成完成");
+                        updateProgress(1, 1);
+                        return null;
+                    } catch (Exception e) {
+                        logger.error("报告生成失败", e);
+                        throw e; // 触发failed()回调
+                    }
+                }
+
+                @Override
+                protected void succeeded() {
+                    progressController.setCompleted();
+                    showAlert("成功", "报告生成完成！\n已保存到: " + savedPath, Alert.AlertType.INFORMATION);
+                }
+
+                @Override
+                protected void failed() {
+                    Throwable e = getException();
+                    progressController.setFailed(extractErrorMessage(e));
+                    showAlert("错误", "报告生成失败:\n" + extractErrorMessage(e), Alert.AlertType.ERROR);
+                }
+
+                @Override
+                protected void cancelled() {
+                    progressStage.close();
+                    showAlert("取消", "操作已取消", Alert.AlertType.INFORMATION);
+                }
+
+                private String extractErrorMessage(Throwable e) {
+                    if (e instanceof IOException) return "文件处理错误: " + e.getMessage();
+                    if (e instanceof IllegalArgumentException) return "参数错误: " + e.getMessage();
+                    return e.getCause() != null ? extractErrorMessage(e.getCause()) : e.getMessage();
+                }
+            };
+
+            // 绑定任务属性到进度窗口
+            progressController.bindProgress(reportTask.progressProperty());
+            progressController.bindMessage(reportTask.messageProperty());
+            progressController.setOnCancel(() -> {
+                if (!reportTask.isDone()) reportTask.cancel();
+            });
+
+            // 启动任务并显示窗口
+            new Thread(reportTask).start();
+            progressStage.show();
+
+        } catch (IOException e) {
+            logger.error("加载进度窗口失败", e);
+            showAlert("错误", "进度窗口加载失败", Alert.AlertType.ERROR);
+        }
+    }
+
+    public List<String> getSelectedRiskLevels() {
+        List<String> selectedLevels = new ArrayList<>();
+
+        riskSelect.getChildren().stream()
+                .filter(node -> node instanceof CheckBox)
+                .map(node -> (CheckBox) node)
+                .filter(CheckBox::isSelected)
+                .forEach(checkBox -> selectedLevels.add(checkBox.getUserData().toString()));
+
+        return selectedLevels;
+    }
+
+    private Map<String, String> collectFormData() {
+        Map<String, String> formData = new HashMap<>();
+
+        // 基本信息
+        formData.put("system_name", systemName.getText());
+        formData.put("create", createPerson.getText());
+        formData.put("audit", checkPerson.getText());
+        formData.put("permit", permitPerson.getText());
+        formData.put("create_date", createDate.getValue().format(DATE_FORMAT));
+        formData.put("audit_date", checkDate.getValue().format(DATE_FORMAT));
+        formData.put("permit_date", permitDate.getValue().format(DATE_FORMAT));
+
+        // 风险级别
+        formData.put("risk", getSelectedRiskLevels().toString());
+
+        // 单位信息
+        formData.put("company", unitName.getText());
+        formData.put("address", unitAddress.getText());
+        formData.put("contact", customContacts.getText());
+        formData.put("project", projectName.getText());
+        formData.put("email", customEmail.getText());
+        formData.put("phone", customPhone.getText());
+
+        // 我方信息
+        // formData.put("our_company", unitName.getText());
+        formData.put("our_email", ourEmail.getText());
+        formData.put("our_contact", ourContact.getText());
+        formData.put("our_phone", ourPhone.getText());
+        formData.put("our_test_person", ourTestPerson.getText());
+
+        // 测试日期
+        formData.put("start_date", startDate.getValue().format(DATE_FORMAT));
+        formData.put("end_date", endDate.getValue().format(DATE_FORMAT));
+
+        return formData;
     }
 
     @FXML
@@ -132,6 +294,26 @@ public class MainController {
         stage.setTitle("API设置");
         stage.setScene(scene);
         stage.show();
+    }
+
+    @FXML
+    @Deprecated
+    private void handleClearButtonAction(ActionEvent event) {
+        systemName.clear();
+        createPerson.clear();
+        checkPerson.clear();
+        permitPerson.clear();
+        fileList.clear();
+    }
+
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 
 }
