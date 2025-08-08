@@ -15,10 +15,7 @@
     <Label fx:id="messageLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
 
     <!-- 进度条 -->
-    <ProgressBar fx:id="progressBar" prefWidth="360" progress="0.0"/>
-
-    <!-- 状态详情标签 -->
-    <Label fx:id="statusLabel" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+    <ProgressBar fx:id="progressBar" prefWidth="360" progress="0.0" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
 
     <!-- 取消按钮 -->
     <Button fx:id="cancelButton" text="取消" onAction="#handleCancel" style="-fx-padding: 5 15; -fx-font-size: 12px;"/>

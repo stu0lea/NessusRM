@@ -14,7 +14,6 @@ public class ProgressDialogController {
 
     @FXML private Label messageLabel;
     @FXML private ProgressBar progressBar;
-    @FXML private Label statusLabel;
     @FXML private Button cancelButton;
 
     private Stage dialogStage;
@@ -27,7 +26,6 @@ public class ProgressDialogController {
     public void initialize() {
         // 设置初始状态
         messageLabel.setText("处理中，请稍候...");
-        statusLabel.setText("准备就绪");
         progressBar.setProgress(0.0);
     }
 
@@ -83,9 +81,6 @@ public class ProgressDialogController {
     /**
      * 更新状态详情文本
      */
-    public void updateStatus(String status) {
-        Platform.runLater(() -> statusLabel.setText(status));
-    }
 
     // ===== 绑定管理 =====
 
@@ -129,14 +124,13 @@ public class ProgressDialogController {
         Platform.runLater(() -> {
             unbindAll();
             messageLabel.setText("操作完成");
-            statusLabel.setText("所有任务已完成");
             progressBar.setProgress(1.0);
             cancelButton.setText("关闭");
 
             // 3秒后自动关闭
             new Thread(() -> {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(2500);
                     Platform.runLater(() -> dialogStage.close());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -152,9 +146,18 @@ public class ProgressDialogController {
         Platform.runLater(() -> {
             unbindAll();
             messageLabel.setText("操作失败");
-            statusLabel.setText("错误: " + errorMessage);
             progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
             cancelButton.setText("关闭");
+
+            // 3秒后自动关闭
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2500);
+                    Platform.runLater(() -> dialogStage.close());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
         });
     }
 

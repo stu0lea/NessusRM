@@ -9,6 +9,8 @@ import tech.tablesaw.api.*;
 import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.selection.Selection;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
@@ -28,15 +30,15 @@ public class MakeReport {
     private static final Logger logger = LoggerFactory.getLogger(MakeReport.class);
     private static final DateTimeFormatter TIMESTAMP_FORMAT =
             DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-    private final Map<String, String> formData; // 新增成员变量存储formData
+    private final Map<String, Object> formData; // 新增成员变量存储formData
 
     // 新增构造函数，接收formData
-    public MakeReport(Map<String, String> formData) {
+    public MakeReport(Map<String, Object> formData) {
         this.formData = formData;
     }
 
-    // 合并CSV文件并进行数据清洗
-    public Table mergeAndCleanCsvFiles(List<File> fileList) throws IOException {
+    // 合并CSV文件
+    public Table mergeCsvFiles(List<File> fileList) throws IOException {
 
         Table mergedTable = null;
 
@@ -46,6 +48,7 @@ public class MakeReport {
                     .maxCharsPerColumn(65535)
                     .lineEnding("\n")
                     .columnTypes(columnName -> ColumnType.STRING)  // 所有列作为字符串处理
+                    .missingValueIndicator("NA", "n/a", "N/A", "null", "NULL", "NaN")  // 声明缺失值标记,字符串列中出现缺省值则自动转为""
                     .build();
             Table currentTable = Table.read().usingOptions(options);
 
@@ -59,8 +62,6 @@ public class MakeReport {
                 mergedTable = mergedTable.append(currentTable);
             }
         }
-
-        // 数据清洗和处理
         return mergedTable;
     }
 
@@ -83,22 +84,26 @@ public class MakeReport {
         return true;
     }
 
-
     // 数据清洗和处理
-    private static Table cleanAndProcessTable(Table table) {
-        // 1. 去除完全重复的行
+    public Table cleanCsvFiles(Table table) {
+        //1. 去除完全重复的行
         Table cleanedTable = table.dropDuplicateRows();
-
-        // 2. 遍历所有列，将空值替换为空字符串
-//        for (String columnName : cleanedTable.columnNames()) {
-//            cleanedTable = Table.replaceMissingValues(columnName, "");
-//        }
-
-        return cleanedTable;
+        //2. 过滤选择的漏洞等级
+        @SuppressWarnings("unchecked")
+        List<String> riskList = (List<String>) formData.get("risk");
+        Table selectRiskTable = cleanedTable.where(cleanedTable.stringColumn("Risk").isIn(riskList));
+        //3. 老版本nessus报告CVSS字段修改为新字段名
+        if (selectRiskTable.containsColumn("CVSS")) selectRiskTable.column("CVSS").setName("CVSS v2.0 Base Score");
+        //4. 遍历所有列，将空值替换为空字符串，读取csv时已配置缺省值自动替换为""，此处不需要替换了
+        //for (Column<?> column : cleanedTable.columns()) {
+        //    StringColumn stringColumn = (StringColumn) column;
+        //    stringColumn.set(stringColumn.isMissing(), "");
+        //}
+        return selectRiskTable;
     }
 
     // 翻译漏洞数据
-    public static Table translateVulnerabilities(Table table) {
+    public Table translateVulnerabilities(Table table) {
         // 添加翻译后的列
         StringColumn pluginNameCn = StringColumn.create("plugin_name_cn");
         StringColumn descriptionCn = StringColumn.create("description_cn");
@@ -336,7 +341,7 @@ public class MakeReport {
 
                 // 4. 插入图表图片
                 try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                    javax.imageio.ImageIO.write(chartImage, "png", baos);
+                    ImageIO.write(chartImage, "png", baos);
                     try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
                         chartParagraph.createRun().addPicture(
                                 is,

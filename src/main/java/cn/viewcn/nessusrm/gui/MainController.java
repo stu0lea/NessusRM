@@ -123,8 +123,8 @@ public class MainController {
         }
 
         // 收集表单数据
-        Map<String, String> formData = collectFormData();
-        System.out.println(formData);
+        Map<String, Object> formData = collectFormData();
+        System.out.println("[+]获取表单数据：" + formData);
 
         try {
             // 加载进度窗口FXML
@@ -134,7 +134,7 @@ public class MainController {
 
             // 配置进度窗口Stage
             Stage progressStage = new Stage();
-            progressStage.setTitle("生成安全报告");
+            progressStage.setTitle("生成报告");
             progressStage.initOwner(((Node) event.getSource()).getScene().getWindow());
             progressStage.initModality(Modality.APPLICATION_MODAL);
             progressStage.setScene(new Scene(progressRoot, 400, 200));
@@ -149,36 +149,43 @@ public class MainController {
                     try {
                         MakeReport makeReport = new MakeReport(formData);
                         // 步骤1: 合并CSV文件
-                        updateMessage("正在合并CSV文件...");
+                        updateMessage("合并CSV文件...");
                         updateProgress(0, 1);
                         List<File> files = new ArrayList<>(fileList);
-                        Table mergedTable = makeReport.mergeAndCleanCsvFiles(files);
-                        System.out.println(mergedTable);
-                        Thread.sleep(500);
+                        Table mergedTable = makeReport.mergeCsvFiles(files);
+                        System.out.println("[+]合并后的CSV：" + mergedTable);
+                        Thread.sleep(1000);
 
-                        // 步骤2: 翻译漏洞信息
-                        updateMessage("正在翻译漏洞信息...");
-                        updateProgress(0.3, 1);
-//                        Table translatedTable = makeReport.translateVulnerabilities(mergedTable);
-                        Thread.sleep(500);
+                        // 步骤2: 清洗过滤CSV数据
+                        updateMessage("清洗过滤CSV文件...");
+                        updateProgress(0.1, 1);
+                        Table cleanedTable = makeReport.cleanCsvFiles(mergedTable);
+                        System.out.println("[+]清理过滤后的CSV：" + cleanedTable);
+                        Thread.sleep(1000);
 
-                        // 步骤3: 分析数据
-                        updateMessage("正在分析漏洞数据...");
+                        // 步骤3: 翻译漏洞信息
+                        updateMessage("翻译漏洞信息...");
+                        updateProgress(0.2, 1);
+                        Table translatedTable = makeReport.translateVulnerabilities(mergedTable);
+                        Thread.sleep(1000);
+
+                        // 步骤4: 分析数据
+                        updateMessage("分析漏洞数据...");
                         updateProgress(0.6, 1);
 //                        Map<String, Object> analysisResults = makeReport.analyzeVulnerabilityData(translatedTable);
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
 
-                        // 步骤4: 生成报告
-                        updateMessage("正在生成报告...");
+                        // 步骤5: 生成报告
+                        updateMessage("生成报告...");
                         updateProgress(0.8, 1);
 //                        byte[] zipBytes = makeReport.generateZipReport(translatedTable, analysisResults, formData);
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
 
-                        // 步骤5: 保存报告
-                        updateMessage("正在保存报告...");
+                        // 步骤6: 保存报告
+                        updateMessage("保存报告...");
                         updateProgress(0.95, 1);
 //                        savedPath = makeReport.saveReport(zipBytes, formData.get("system_name"));
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                         // 完成
                         updateMessage("报告生成完成");
                         updateProgress(1, 1);
@@ -234,7 +241,6 @@ public class MainController {
 
     public List<String> getSelectedRiskLevels() {
         List<String> selectedLevels = new ArrayList<>();
-
         riskSelect.getChildren().stream()
                 .filter(node -> node instanceof CheckBox)
                 .map(node -> (CheckBox) node)
@@ -244,10 +250,10 @@ public class MainController {
         return selectedLevels;
     }
 
-    private Map<String, String> collectFormData() {
-        Map<String, String> formData = new HashMap<>();
+    private Map<String, Object> collectFormData() {
+        Map<String, Object> formData = new HashMap<>();
 
-        // 基本信息
+        // 基本信息（字符串）
         formData.put("system_name", systemName.getText());
         formData.put("create", createPerson.getText());
         formData.put("audit", checkPerson.getText());
@@ -256,10 +262,10 @@ public class MainController {
         formData.put("audit_date", checkDate.getValue().format(DATE_FORMAT));
         formData.put("permit_date", permitDate.getValue().format(DATE_FORMAT));
 
-        // 风险级别
-        formData.put("risk", getSelectedRiskLevels().toString());
+        // 风险级别（直接存储列表）
+        formData.put("risk", getSelectedRiskLevels());
 
-        // 单位信息
+        // 单位信息（字符串）
         formData.put("company", unitName.getText());
         formData.put("address", unitAddress.getText());
         formData.put("contact", customContacts.getText());
@@ -267,14 +273,14 @@ public class MainController {
         formData.put("email", customEmail.getText());
         formData.put("phone", customPhone.getText());
 
-        // 我方信息
+        // 我方信息（字符串）
         // formData.put("our_company", unitName.getText());
         formData.put("our_email", ourEmail.getText());
         formData.put("our_contact", ourContact.getText());
         formData.put("our_phone", ourPhone.getText());
         formData.put("our_test_person", ourTestPerson.getText());
 
-        // 测试日期
+        // 测试日期（字符串）
         formData.put("start_date", startDate.getValue().format(DATE_FORMAT));
         formData.put("end_date", endDate.getValue().format(DATE_FORMAT));
 
