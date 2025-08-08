@@ -40,7 +40,6 @@ build/
 Thumbs.db
 /config.properties
 /note.txt
-*.csv
 *.sql
 *.sqlite
 /mvnw
