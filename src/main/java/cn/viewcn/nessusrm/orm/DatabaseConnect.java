@@ -8,7 +8,7 @@ import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
 
 public class DatabaseConnect {
-    private static final String DATABASE_URL = "jdbc:sqlite:plugin_db.sqlite";
+    private static final String DATABASE_URL = "jdbc:sqlite:nessus_vul_db.sqlite";
     private static ConnectionSource connectionSource;
 
     private static Dao<PluginTranslation, String> pluginDao;

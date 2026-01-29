@@ -1,5 +1,5 @@
 Plugin ID,CVE,CVSS,Risk,Host,Protocol,Port,Name,Synopsis,Description,Solution,See Also,Plugin Output
-"10106","","","None","127.0.0.1","tcp","5216","HTTP Server Type and Version","A web server","n/a","","test","test"
+"93144","","","None","127.0.0.1","tcp","5216","HTTP Server Type","A web server","n/a","","test","test"
 "10107","","","High","127.0.0.1","tcp","5216","HTTP Server Type and Version","A web server","n/a","","test","test"
 "10107","","","High","127.0.0.1","tcp","5216","HTTP Server Type and Version","A web server","n/a","","test","test"
 "10108","","","Low","127.0.0.1","tcp","5216","HTTP Server Type and Version","A web server","n/a","","test","test"

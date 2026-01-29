@@ -5,6 +5,7 @@ import cn.viewcn.nessusrm.api.TxTransSplitApi;
 import cn.viewcn.nessusrm.orm.DatabaseConnect;
 import cn.viewcn.nessusrm.orm.PluginTranslation;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.sql.*;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class NessusTrans {
     private static final Gson gson = new Gson();
     private final Map<String, String> csvRow;
-    private final Map<String, Object> transResult = new HashMap<>();
+    private final Map<String, String> transResult = new HashMap<>();
     private static final Map<String, String> riskMap = new HashMap<String, String>() {{
         put("Critical", "严重");
         put("High", "高危");
@@ -84,13 +85,17 @@ public class NessusTrans {
     public void transUseTenable() throws IOException {
         // 请求Tenable官方中文
         String pluginId = csvRow.get("Plugin ID");
-        Map<String, Object> tenableData = gson.fromJson(TenableTransApi.translate(pluginId), new TypeToken<Map<String, Object>>() {}.getType()
-        );
-        transResult.put("plugin_name_cn", tenableData.get("script_name"));
-        transResult.put("risk_cn", riskMap.get((String) tenableData.get("risk_factor")));
-        transResult.put("synopsis_cn", delNewlines((String) tenableData.get("synopsis")));
-        transResult.put("description_cn", delNewlines((String) tenableData.get("description")));
-        transResult.put("solution_cn", delNewlines((String) tenableData.get("solution")));
+        JsonObject tenableData = TenableTransApi.translate(pluginId);
+        // 以上传的漏洞级别为准，不翻译漏洞级别。
+        JsonObject script_name_i18n = tenableData.getAsJsonObject("script_name_i18n");
+        JsonObject synopsis_i18n = tenableData.getAsJsonObject("synopsis_i18n");
+        JsonObject description_i18n = tenableData.getAsJsonObject("description_i18n");
+        JsonObject solution_i18n = tenableData.getAsJsonObject("solution_i18n");
+
+        transResult.put("plugin_name_cn", script_name_i18n.get("zh_CN").getAsString());
+        transResult.put("synopsis_cn", delNewlines(synopsis_i18n.get("zh_CN").getAsString()));
+        transResult.put("description_cn", delNewlines(description_i18n.get("zh_CN").getAsString()));
+        transResult.put("solution_cn", delNewlines(solution_i18n.get("zh_CN").getAsString()));
     }
 
     public void transUseTx() {
@@ -102,7 +107,7 @@ public class NessusTrans {
         transResult.put("solution_cn", delNewlines(TxTransSplitApi.translate(csvRow.get("Solution"))));
     }
 
-    public Map<String, Object> transMain() {
+    public Map<String, String> transMain() {
         // 翻译执行顺序：本地库 or 官方中文API or 腾讯翻译API -> 翻译结果存储到本地库
         try {
             // 1.本地库翻译
@@ -150,7 +155,7 @@ public class NessusTrans {
     public static void main(String[] args) {
     // 测试 中文官方id：95633
         Map<String, String> testData = new HashMap<String, String>() {{
-                put("Plugin ID", "95633");
+                put("Plugin ID", "93144");
                 put("CVE", "CVE-2005-1794");
                 put("CVSS v2.0 Base Score", "5.1");
                 put("Risk", "High");
@@ -161,8 +166,8 @@ public class NessusTrans {
             }};
         NessusTrans translator = new NessusTrans(testData);
         try {
-            Map<String, Object> result = translator.transMain();
-            System.out.println("最终翻译结果: " + result);
+            Map<String, String> result = translator.transMain();
+            System.out.println("最终翻译结果: " + gson.toJsonTree(result).getAsJsonObject());
         } catch (Exception e) {
             e.printStackTrace();
         }

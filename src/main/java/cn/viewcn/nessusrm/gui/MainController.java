@@ -167,6 +167,7 @@ public class MainController {
                         updateMessage("翻译漏洞信息...");
                         updateProgress(0.2, 1);
                         Table translatedTable = makeReport.translateVulnerabilities(mergedTable);
+                        System.out.println("[+]翻译后的CSV：" + translatedTable);
                         Thread.sleep(1000);
 
                         // 步骤4: 分析数据

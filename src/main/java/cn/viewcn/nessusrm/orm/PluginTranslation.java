@@ -52,7 +52,7 @@ public class PluginTranslation {
     public PluginTranslation() {}
 
     // 带参数的构造函数
-    public PluginTranslation(Map<String, Object> data) {
+    public PluginTranslation(Map<String, String> data) {
         this.pluginId = (String) data.get("plugin_id");
         this.cve = (String) data.get("cve");
         this.cvss = (String) data.get("cvss");

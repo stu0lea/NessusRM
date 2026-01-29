@@ -93,7 +93,7 @@ public class MakeReport {
         List<String> riskList = (List<String>) formData.get("risk");
         Table selectRiskTable = cleanedTable.where(cleanedTable.stringColumn("Risk").isIn(riskList));
         //3. 老版本nessus报告CVSS字段修改为新字段名
-        if (selectRiskTable.containsColumn("CVSS")) selectRiskTable.column("CVSS").setName("CVSS v2.0 Base Score");
+            if (selectRiskTable.containsColumn("CVSS")) selectRiskTable.column("CVSS").setName("CVSS v2.0 Base Score");
         //4. 遍历所有列，将空值替换为空字符串，读取csv时已配置缺省值自动替换为""，此处不需要替换了
         //for (Column<?> column : cleanedTable.columns()) {
         //    StringColumn stringColumn = (StringColumn) column;
@@ -103,44 +103,49 @@ public class MakeReport {
     }
 
     // 翻译漏洞数据
-    public Table translateVulnerabilities(Table table) {
+    public Table translateVulnerabilities(Table cleanedTable) {
         // 添加翻译后的列
-        StringColumn pluginNameCn = StringColumn.create("plugin_name_cn");
-        StringColumn descriptionCn = StringColumn.create("description_cn");
-        StringColumn solutionCn = StringColumn.create("solution_cn");
-        StringColumn riskCn = StringColumn.create("risk_cn");
+        cleanedTable.addColumns(
+                cleanedTable.column("Name").copy().setName("NameCN"),
+                cleanedTable.column("Risk").copy().setName("RiskCN"),
+                cleanedTable.column("Synopsis").copy().setName("SynopsisCN"),
+                cleanedTable.column("Description").copy().setName("DescriptionCN"),
+                cleanedTable.column("Solution").copy().setName("SolutionCN")
+        );
 
-        // 遍历每一行进行翻译
-        for (Row row : table) {
-            Map<String, String> rowData = new HashMap<>();
-            for (Column<?> column : table.columns()) {
-                rowData.put(column.name(), row.getString(column.name()));
-            }
+        // 遍历每一行翻译Name、Risk、Synopsis、Description、Solution字段
+        for (Row row : cleanedTable) {
+            String pluginId = row.getString("Plugin ID");
 
             try {
-                // 使用NessusTrans进行翻译（这里简化为示例）
-                Map<String, Object> transResult = new HashMap<>();
-                transResult.put("plugin_name_cn", "中文名称: " + row.getString("Name"));
-                transResult.put("description_cn", "中文描述: " + row.getString("Description"));
-                transResult.put("solution_cn", "中文解决方案: " + row.getString("Solution"));
-                transResult.put("risk_cn", translateRiskLevel(row.getString("Risk")));
+                // 构建row数据为map
+                Map<String, String> rowData = new HashMap<>();
+                for (String colName : row.columnNames()) {
+                    rowData.put(colName, row.getString(colName));
+                }
 
-                pluginNameCn.append(transResult.get("plugin_name_cn").toString());
-                descriptionCn.append(transResult.get("description_cn").toString());
-                solutionCn.append(transResult.get("solution_cn").toString());
-                riskCn.append(transResult.get("risk_cn").toString());
+                // 调用翻译器
+                NessusTrans translator = new NessusTrans(rowData);
+                Map<String, String> result = translator.transMain();
+
+                // 更新中文列
+                row.setString("NameCN", (String) result.get("plugin_name_cn"));
+                row.setString("RiskCN", (String) result.get("risk_cn"));
+                row.setString("SynopsisCN", (String) result.get("synopsis_cn"));
+                row.setString("DescriptionCN", (String) result.get("description_cn"));
+                row.setString("SolutionCN", (String) result.get("solution_cn"));
+
+                // 打印成功日志
+                System.out.println("[+]翻译成功,插件ID:" + pluginId);
+
+
             } catch (Exception e) {
-                // 翻译失败时使用原始数据
-                pluginNameCn.append(row.getString("Name"));
-                descriptionCn.append(row.getString("Description"));
-                solutionCn.append(row.getString("Solution"));
-                riskCn.append(translateRiskLevel(row.getString("Risk")));
+                // 打印错误日志
+                System.out.println("[-]翻译错误,插件ID:" + pluginId + ",错误信息:" + e.getMessage());
+
             }
         }
-
-        // 添加翻译后的列到表
-        table.addColumns(pluginNameCn, descriptionCn, solutionCn, riskCn);
-        return table;
+        return cleanedTable;
     }
 
     private static String translateRiskLevel(String risk) {

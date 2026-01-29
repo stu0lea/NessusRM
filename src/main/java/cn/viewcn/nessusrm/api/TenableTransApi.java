@@ -33,10 +33,10 @@ public class TenableTransApi {
         }
     }
 
-    public static String translate(String pluginId) throws IOException {
+    public static JsonObject translate(String pluginId) throws IOException {
         String token = getToken();
         System.out.println("Token:" + token);
-        String url = String.format("https://zh-cn.tenable.com/_next/data/%s/zh-CN/plugins/nessus/%s.json?type=nessus&id=%s",
+        String url = String.format("https://www.tenable.com/_next/data/%s/en/plugins/nessus/%s.json?type=nessus&id=%s",
                 token, pluginId, pluginId);
 
         Request request = new Request.Builder()
@@ -52,8 +52,7 @@ public class TenableTransApi {
                 String jsonData = response.body().string();
                 JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
                 JsonObject pageProps = jsonObject.getAsJsonObject("pageProps");
-                JsonObject pluginData = pageProps.getAsJsonObject("plugin");
-                return pluginData.toString();
+                return pageProps.getAsJsonObject("plugin");
             } catch (Exception e) {
                 throw new IOException("响应体json数据格式错误", e);
             }
@@ -62,7 +61,7 @@ public class TenableTransApi {
 
     public static void main(String[] args) {
         try {
-            String result = TenableTransApi.translate("159826");
+            String result = TenableTransApi.translate("159826").toString();
             System.out.println(result);
         } catch (IOException e) {
             e.printStackTrace();
